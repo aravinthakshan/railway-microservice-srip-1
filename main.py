@@ -118,6 +118,35 @@ async def process_pdf(
             records = df.to_dict('records')
             records_count = len(records)
             
+            # Upload to MongoDB
+            try:
+                from pymongo import MongoClient
+                import os
+                
+                MONGO_URI = os.environ.get('MONGODB_URI')
+                if not MONGO_URI:
+                    raise HTTPException(status_code=500, detail="MONGODB_URI environment variable not set")
+                
+                client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)
+                # Test connection
+                client.admin.command('ping')
+                
+                db = client['rainfall-data']
+                collection = db['rainfalldatas']
+                
+                # Insert records into MongoDB
+                if records:
+                    result = collection.insert_many(records)
+                    logger.info(f"Successfully uploaded {len(result.inserted_ids)} records to MongoDB")
+                else:
+                    logger.warning("No records to upload to MongoDB")
+                
+                client.close()
+                
+            except Exception as e:
+                logger.error(f"MongoDB upload failed: {e}")
+                raise HTTPException(status_code=500, detail=f"MongoDB upload failed: {str(e)}")
+            
             processing_time = int((time.time() - start_time) * 1000)
             
             logger.info(f"Successfully processed PDF: {records_count} records in {processing_time}ms")
@@ -125,7 +154,7 @@ async def process_pdf(
             return PDFProcessResponse(
                 success=True,
                 records_count=records_count,
-                message=f"PDF processed successfully. {records_count} records extracted.",
+                message=f"PDF processed successfully. {records_count} records extracted and uploaded to MongoDB.",
                 processing_time_ms=processing_time
             )
             
@@ -185,6 +214,35 @@ async def process_pdf_base64(request: PDFProcessRequest):
             records = df.to_dict('records')
             records_count = len(records)
             
+            # Upload to MongoDB
+            try:
+                from pymongo import MongoClient
+                import os
+                
+                MONGO_URI = os.environ.get('MONGODB_URI')
+                if not MONGO_URI:
+                    raise HTTPException(status_code=500, detail="MONGODB_URI environment variable not set")
+                
+                client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)
+                # Test connection
+                client.admin.command('ping')
+                
+                db = client['rainfall-data']
+                collection = db['rainfalldatas']
+                
+                # Insert records into MongoDB
+                if records:
+                    result = collection.insert_many(records)
+                    logger.info(f"Successfully uploaded {len(result.inserted_ids)} records to MongoDB")
+                else:
+                    logger.warning("No records to upload to MongoDB")
+                
+                client.close()
+                
+            except Exception as e:
+                logger.error(f"MongoDB upload failed: {e}")
+                raise HTTPException(status_code=500, detail=f"MongoDB upload failed: {str(e)}")
+            
             processing_time = int((time.time() - start_time) * 1000)
             
             logger.info(f"Successfully processed base64 PDF: {records_count} records in {processing_time}ms")
@@ -192,7 +250,7 @@ async def process_pdf_base64(request: PDFProcessRequest):
             return PDFProcessResponse(
                 success=True,
                 records_count=records_count,
-                message=f"PDF processed successfully. {records_count} records extracted.",
+                message=f"PDF processed successfully. {records_count} records extracted and uploaded to MongoDB.",
                 processing_time_ms=processing_time
             )
             
