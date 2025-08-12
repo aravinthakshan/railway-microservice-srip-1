@@ -2,44 +2,40 @@
 
 A FastAPI-based microservice for parsing rainfall PDF reports and extracting structured data.
 
-## 🚀 Quick Deploy to Railway
+## 🚀 Quick Deploy to Render
 
-### 1. **Install Railway CLI**
+### 1. **Push to GitHub**
 ```bash
-npm install -g @railway/cli
+git add .
+git commit -m "Add rainfall PDF parser microservice"
+git push origin main
 ```
 
-### 2. **Login to Railway**
-```bash
-railway login
-```
+### 2. **Deploy on Render**
+1. Go to [render.com](https://render.com) and sign up/login
+2. Click **"New +"** → **"Web Service"**
+3. Connect your GitHub repository
+4. Select the `pdf-parser-microservice` folder
+5. Configure:
+   - **Name**: `rainfall-pdf-parser`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python main.py`
+6. Click **"Create Web Service"**
 
-### 3. **Initialize Project**
-```bash
-cd railway-microservice
-railway init
-```
-
-### 4. **Deploy to Railway**
-```bash
-railway up
-```
-
-### 5. **Get Your Service URL**
-```bash
-railway status
-```
+### 3. **Get Your Service URL**
+Render will provide a URL like: `https://your-service.onrender.com`
 
 ## 📁 Project Structure
 
 ```
-railway-microservice/
+pdf-parser-microservice/
 ├── main.py              # FastAPI application
 ├── parser.py            # PDF parsing logic (copied from python-scripts)
 ├── requirements.txt     # Python dependencies
-├── railway.json         # Railway configuration
-├── Procfile            # Railway startup command
-└── README.md           # This file
+├── render.yaml          # Render configuration
+├── README.md           # This file
+└── test_local.py       # Test script for local testing
 ```
 
 ## 🔧 API Endpoints
@@ -57,14 +53,14 @@ railway-microservice/
 
 ### **1. Process PDF File**
 ```bash
-curl -X POST "https://your-service.railway.app/process-pdf" \
+curl -X POST "https://your-service.onrender.com/process-pdf" \
   -F "pdf_file=@rainfall_report.pdf" \
   -F "date=15/01/2024"
 ```
 
 ### **2. Process Base64 PDF**
 ```bash
-curl -X POST "https://your-service.railway.app/process-pdf-base64" \
+curl -X POST "https://your-service.onrender.com/process-pdf-base64" \
   -H "Content-Type: application/json" \
   -d '{
     "pdf_data": "base64_encoded_pdf_content",
@@ -74,16 +70,16 @@ curl -X POST "https://your-service.railway.app/process-pdf-base64" \
 
 ## 🔗 Integration with Vercel
 
-Update your Vercel app to call this Railway service:
+Update your Vercel app to call this Render service:
 
 ```typescript
 // In your Vercel actions.ts
-async function callRailwayService(pdfFile: File, date: string) {
+async function callRenderService(pdfFile: File, date: string) {
   const formData = new FormData()
   formData.append('pdf_file', pdfFile)
   formData.append('date', date)
   
-  const response = await fetch('https://your-service.railway.app/process-pdf', {
+  const response = await fetch('https://your-service.onrender.com/process-pdf', {
     method: 'POST',
     body: formData
   })
@@ -94,9 +90,9 @@ async function callRailwayService(pdfFile: File, date: string) {
 
 ## 🌍 Environment Variables
 
-Railway will automatically set:
-- `PORT` - Service port (Railway sets this)
-- `RAILWAY_STATIC_URL` - Your service URL
+Render will automatically set:
+- `PORT` - Service port (Render sets this)
+- `RENDER_EXTERNAL_URL` - Your service URL
 
 ## 📝 Dependencies
 
@@ -111,7 +107,7 @@ The service requires these Python packages:
 ## 🚨 Troubleshooting
 
 ### **Service Won't Start**
-1. Check `railway logs` for errors
+1. Check Render logs in the dashboard
 2. Verify all dependencies are in `requirements.txt`
 3. Ensure `parser.py` is in the same directory
 
@@ -128,35 +124,34 @@ The service requires these Python packages:
 ## 📈 Monitoring
 
 ### **View Logs**
-```bash
-railway logs
-```
+- Go to your Render dashboard
+- Click on your service
+- Go to "Logs" tab
 
 ### **Service Status**
-```bash
-railway status
-```
+- Check the "Events" tab in Render dashboard
+- Monitor uptime and performance
 
 ### **Service URL**
-```bash
-railway domain
-```
+- Found in your service overview
+- Usually `https://service-name.onrender.com`
 
 ## 🔄 Updates
 
 To update your service:
 1. Make changes to your code
 2. Commit and push to GitHub
-3. Run `railway up` to redeploy
+3. Render will automatically redeploy
 
 ## 💰 Costs
 
-- **Railway Hobby Plan**: $5/month
-- **Railway Pro Plan**: $20/month (includes more resources)
+- **Render Free Plan**: $0/month (with limitations)
+- **Render Starter Plan**: $7/month (more resources)
+- **Render Standard Plan**: $25/month (production ready)
 
 ## 🎯 Next Steps
 
-1. **Deploy to Railway** using the commands above
+1. **Deploy to Render** using the steps above
 2. **Test the endpoints** with a sample PDF
 3. **Update your Vercel app** to call this service
 4. **Monitor performance** and adjust as needed
@@ -164,7 +159,18 @@ To update your service:
 ## 🆘 Support
 
 If you encounter issues:
-1. Check Railway logs: `railway logs`
+1. Check Render logs in the dashboard
 2. Verify service health: `GET /health`
 3. Test parser: `GET /test-parser`
-4. Check Railway status: `railway status` 
+4. Check Render service status
+
+## 🆚 Render vs Railway
+
+| Feature | Render | Railway |
+|---------|--------|---------|
+| **Free Tier** | ✅ Yes | ❌ No ($5/month min) |
+| **Python Support** | ✅ Excellent | ✅ Good |
+| **Deployment** | GitHub integration | CLI + GitHub |
+| **HTTPS** | ✅ Automatic | ✅ Automatic |
+| **Custom Domains** | ✅ Yes | ✅ Yes |
+| **Cost** | $0/month (free) | $5/month minimum | 

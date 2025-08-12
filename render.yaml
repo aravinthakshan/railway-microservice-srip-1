@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rainfall-pdf-parser
+    env: python
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: PIP_NO_CACHE_DIR
+        value: "1" 
